@@ -1,0 +1,42 @@
+.intro {
+    min-height: 100vh;
+    padding-top: 16rem;
+
+    font-family: 'roboto';
+
+//    background: url(https://placehold.it/1440x962) no-repeat center/cover
+    background: linear-gradient( rgba(0, 0, 0, .8), rgba(0, 0, 0, .3) ), url(../images/mafia-11.jpg) no-repeat center/cover;
+}
+
+.intro__title {
+    font-size: 6rem;
+    font-weight: 300;
+    line-height: .9;
+
+    padding-right: 5rem;
+    text-transform: uppercase;
+}
+
+.intro__subtitle {
+    margin-bottom: 11rem;
+    padding-right: 5rem;
+
+    font-weight: 500;
+    font-size: 3rem;
+    text-transform: uppercase;
+
+}
+
+.intro__desc {
+    margin: 0 auto;
+    margin-bottom: 12rem;
+
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: .9;
+
+    max-width: 60rem;
+
+}
+
+

@@ -1,0 +1,53 @@
+.nav__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    height: 100%;
+}
+
+.nav__item {
+    position: relative;
+    margin: 0 1.5rem;
+
+    &:hover {
+        >.subnav {
+            display: block;
+        }
+    }
+}
+
+.nav__link {
+    display: inline-block;
+    font-size: 1.4rem;
+
+    text-decoration: none;
+    color: $secondary;
+    text-transform: uppercase;
+    font-weight: 700;
+    &:after {
+        content: '';
+        width: 0;
+        height: 2px;
+
+        background-color: $secondary;
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        z-index: 1;
+
+        transition: width .2s linear;
+    }
+    &:hover:not(.has_subnav){
+        &:after {
+            width: 100%;
+        }
+    }
+
+    &.has_subnav {
+        position: relative;
+        padding-right: 2rem;
+        background: url(../images/svg/pin.png) no-repeat 100% center;
+        background-size: 10px;
+    }
+}
+

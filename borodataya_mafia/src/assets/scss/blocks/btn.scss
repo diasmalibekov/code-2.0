@@ -1,0 +1,22 @@
+.btn {
+    display: inline-block;
+
+    font-weight: 700;
+    letter-spacing: .05em;
+    color: $secondary;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-family: sans-serif;
+    text-shadow: none;
+
+    border-radius: .7em;
+
+    padding: 1em 2em;
+
+    background-color: #e67e22;
+
+    &:hover,
+    &:focus {
+        background-color: darken(#e67e22, 7%);
+    }
+}

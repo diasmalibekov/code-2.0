@@ -1,0 +1,27 @@
+.header {
+    padding: 1.2rem;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+
+}
+
+.header__inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    min-height: 6rem;
+    background-color: transparent;
+}
+
+.header__logo-link {
+    color: $secondary;
+    font-weight: 700;
+    text-transform: uppercase;
+
+    text-decoration: none;
+
+}
