@@ -1,0 +1,8 @@
+загрузка изображения:
+var img = new Image();   // Create new img element
+img.src = 'myImage.png'; // Set source path
+
+отрисовка объекта через context.drawIMage.'slice'
+
+сохранение изображения с помощью элемента save()
+непрерывное закрашивание с mousemove-pixelmanipulation
