@@ -42,21 +42,3 @@ function loadGame() {
         sqrs[i].endFill()
     }
 }
-//    container.children.forEach(child => container.removeChild(child))
-//
-//
-//    for (let i = 0; i < 49; i++) {
-//    let sqr = new Graphics()
-//    sqr.lineStyle(1, 0x000000, 1);
-//    sqr.beginFill(loaded[i])
-//    sqr.drawRect(0, 0, 32, 32)
-//    sqr.endFill()
-//    sqr.interactive = true;
-//    sqr.buttonMode = true;
-//    sqr.color = loaded[i]
-//    sqr.x = (i % 7) * 32
-//    sqr.y = Math.floor(i / 7) * 32
-//    sqr.on('pointerdown', sqrClick)
-//    container.addChild(sqr)
-//    }
-//}

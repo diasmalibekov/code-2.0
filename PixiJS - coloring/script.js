@@ -96,7 +96,7 @@ const container = new Container()
 app.stage.addChild(container)
 
 //создаю сетку из прямоугольников 7х7 со сплошной черной рамкой вокруг каждого для визуального разделения
-for (let i = 0; i < 121; i++) {
+for (let i = 0; i < 100; i++) {
     let sqr = new Graphics()
     sqr.lineStyle(1, 0x000000, 1);
     sqr.beginFill(0xFFFFFF)
@@ -105,8 +105,8 @@ for (let i = 0; i < 121; i++) {
     sqr.interactive = true;
     sqr.buttonMode = true;
     sqr.color = '0xFFFFFF'
-    sqr.x = (i % 11) * 32
-    sqr.y = Math.floor(i / 11) * 32
+    sqr.x = (i % 10) * 32
+    sqr.y = Math.floor(i / 10) * 32
     sqrs.push(sqr)
 
     //    прослушивание клика и функция обработчик
