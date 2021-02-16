@@ -21,7 +21,6 @@ document.body.appendChild(app.view)
 //.список для хранения кружков с цветом
 //.список с прямоугольниками
 
-const colors = 5
 let selectedColor,
     colorSelected = false,
     circles = [],
@@ -71,11 +70,11 @@ resizeSm.on('pointerdown', resizeSmClick)
 app.stage.addChild(resizeSm)
 
 // создаю палитру с выбором цвета
-for(let i = 0; i < colors; i++) {
+for(let i = 0; i < tenColors.length; i++) {
     let circle = new Graphics()
-    let randomColor = Math.random() * 0xFFFFFF
-    circle.beginFill(randomColor)
-    circle.color = randomColor
+    let color = rgb2hex(mainColors[i][0], mainColors[i][1], mainColors[i][2])
+    circle.beginFill(color)
+    circle.color = color
     circle.drawCircle(20, 20, 16)
     circle.endFill()
     circle.interactive = true;
