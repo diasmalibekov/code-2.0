@@ -15,6 +15,7 @@ let app = new Application({
 })
 
 document.body.appendChild(app.view)
+console.log(typeof(PIXI))
 
 //объявляю:
 //.количество цветов и глобалную переменную для хранения цвета
@@ -70,9 +71,9 @@ resizeSm.on('pointerdown', resizeSmClick)
 app.stage.addChild(resizeSm)
 
 // создаю палитру с выбором цвета
-for(let i = 0; i < tenColors.length; i++) {
+for(let i = 0; i < 7; i++) {
     let circle = new Graphics()
-    let color = rgb2hex(mainColors[i][0], mainColors[i][1], mainColors[i][2])
+    let color = Math.random() * 0xFFFFFF
     circle.beginFill(color)
     circle.color = color
     circle.drawCircle(20, 20, 16)
