@@ -1,3 +1,7 @@
+//________________________________
+//ОБЪЯВЛЕНИЕ ПЕРЕМЕННЫХ
+
+
 let Application = PIXI.Application,
     loader = PIXI.Loader,
     resources = PIXI.Loader.resources,
@@ -30,14 +34,17 @@ for (let color of mainColors) {
     let closest = closestColor(color, tenColors)
     finalColors.push(rgb2hex(closest[0], closest[1], closest[2]))
 }
-const style = new PIXI.TextStyle({
-    fontSize: 20
-})
+let pointerDown = false,
+    mouseposition = app.renderer.plugins.interaction.mouse.global,
+    selectedColor,
+    colorSelected = false,
+    circles = [],
+    sqrs = [],
+    scaleCount = 0
 
-//объявляю:
-//.количество цветов и глобалную переменную для хранения цвета
-//.список для хранения кружков с цветом
-//.список с прямоугольниками
+
+//__________________________________
+//СПРАЙТЫ
 
 
 //кнопка сохранения в localStorage
@@ -52,11 +59,6 @@ save.buttonMode = true
 save.on('pointerdown', saveGame)
 app.stage.addChild(save)
 
-let selectedColor,
-    colorSelected = false,
-    circles = [],
-    sqrs = [],
-    scaleCount = 0
 
 //кнопка перезагрузка игры
 const reset = Sprite.from('images/reset.png')
@@ -112,6 +114,7 @@ load.buttonMode = true
 load.on('pointerdown', loadGame)
 app.stage.addChild(load)
 
+//ПРОВЕРКА ПРОХОЖДЕНИЯ ИГРЫ
 const checkStatus = Sprite.from('images/checked.png')
 checkStatus.anchor.set(.5)
 checkStatus.x = app.screen.width / 2
@@ -127,6 +130,11 @@ app.stage.addChild(checkStatus)
 //и добавляю его дочерним элеметом в stage
 const container = new Container()
 app.stage.addChild(container)
+
+
+//_______________________________
+//ВСЕ НЕОБХОДИМЫЕ ЦИКЛЫ
+
 
 //создаю сетку из прямоугольников 7х7 со сплошной черной рамкой вокруг каждого для визуального разделения
 for (let i = 0; i < 100; i++) {
@@ -161,8 +169,63 @@ container.y = app.screen.height / 2
 container.pivot.x = container.width / 2
 container.pivot.y = container.height / 2
 
+// СОЗДАНИЕ ПАЛИТРЫ С ВЫБОРОМ ЦВЕТА ИЗ 10 ГЛАВНЫХ ЦВЕТОВ
+for(let i = 0; i < 10; i++) {
+    let circle = new Graphics()
+//    let color = Math.random() * 0xFFFFFF
+    circle.beginFill(getKeyByValue(mainPalette, i))
+    circle.color = getKeyByValue(mainPalette, i)
+    circle.drawCircle(20, 20, 16)
+    circle.endFill()
+    circle.interactive = true;
+    circle.buttonMode = true;
+    circle.y = i * 45
+    let colorNum = new Text(mainPalette[circle.color] + 1, {fontSize: 20})
+    colorNum.x = 50
+    colorNum.y = circle.y + 10
+    app.stage.addChild(colorNum)
+
+//    прослушивание клика и функция обработчик
+    circle.on('pointerdown', circleClick)
+
+    app.stage.addChild(circle)
+    circles.push(circle)
+}
+
+
+//ЕСЛИ ИЗОБРАЖЕНИЕ ЗАГРУЖЕНО КАНВАС ПЕРЕЗАПУСКАЕТСЯ
+for (let i = 0; i < sqrs.length; i++) {
+    sqrs[i].clear()
+    sqrs[i].beginFill(0xFFFFFF)
+    sqrs[i].neededColor = finalColors[i]
+    sqrs[i].lineStyle(1, 0x000000, 1)
+    sqrs[i].drawRect(0, 0, 32, 32)
+    sqrs[i].endFill()
+    let text = new Text(mainPalette[finalColors[i]] + 1, {fontSize: 20})
+    text.x = sqrs[i].x
+    text.y = sqrs[i].y
+    container.addChild(text)
+}
+
+
 //______________________________________
 //FUNCTIONS
+
+
+//ПОЛУЧЕНИЕ 10 ДОМНИРУЮЩИХ ЦВЕТОВ
+function getMainPalette(img) {
+    const colorThief = new ColorThief();
+    if (img.complete) {
+        colorThief.getColor(img);
+    }
+    else {
+        img.addEventListener('load', function () {
+            colorThief.getColor(img);
+        });
+    }
+    return colorThief.getPalette(img)
+}
+
 
 //меняю значение colorSelected на false
 //отрисовываю сетку
@@ -181,7 +244,6 @@ function resetClick() {
     })
 }
 
-
 // сохраняю выбранный цвет в глобальую переменную
 //увеличиваю размер выбранного кружка для визуала
 //если цвет уже был выбран, циклом возвращаю всем элементам исходный размер
@@ -192,108 +254,6 @@ function circleClick() {
     this.scale.set(1.2)
 }
 
-
-let pointerDown = false,
-    mouseposition = app.renderer.plugins.interaction.mouse.global;
-
-//заменяю отрисованный квадрат другим с выбранным цветом
-function sqrClickStart() {
-    if(colorSelected) {
-        pointerDown = true
-        this.clear()
-        this.beginFill(selectedColor)
-        this.color = selectedColor
-        this.lineStyle(1, 0x000000, 1)
-        this.drawRect(0, 0, 32, 32)
-        this.endFill()
-    }
-}
-
-function sqrClickEnd() {
-    pointerDown = false
-}
-
-
-function sqrClickMove() {
-    if (mouseposition.x < 96 || mouseposition.x > (94 + container.width) || mouseposition.y < 96 || mouseposition.y > (94 + container.height)) {
-        pointerDown = false
-    }
-    if (pointerDown){
-        this.clear()
-        this.beginFill(selectedColor)
-        this.color = selectedColor
-        this.lineStyle(1, 0x000000, 1)
-        this.drawRect(0, 0, 32, 32)
-        this.endFill()
-    }
-}
-
-//увеличение до 8 раз, чтобы контейнер не перекрывал кнопки
-function resizeBigClick() {
-    if (scaleCount !== 8){
-        scaleCount++
-        container.scale.set(1 + (0.1 * scaleCount))
-    }
-}
-
-//уменьшение картинки до начальных размеров
-function resizeSmClick() {
-    scaleCount = 0
-    container.scale.set(1)
-}
-
-
-// создаю палитру с выбором цвета
-for(let i = 0; i < 10; i++) {
-    let circle = new Graphics()
-//    let color = Math.random() * 0xFFFFFF
-    circle.beginFill(getKeyByValue(mainPalette, i))
-    circle.color = getKeyByValue(mainPalette, i)
-    circle.drawCircle(20, 20, 16)
-    circle.endFill()
-    circle.interactive = true;
-    circle.buttonMode = true;
-    circle.y = i * 45
-    let colorNum = new Text(mainPalette[circle.color] + 1, style)
-    colorNum.x = 50
-    colorNum.y = circle.y + 10
-    app.stage.addChild(colorNum)
-
-//    прослушивание клика и функция обработчик
-    circle.on('pointerdown', circleClick)
-
-    app.stage.addChild(circle)
-    circles.push(circle)
-}
-
-for (let i = 0; i < sqrs.length; i++) {
-    sqrs[i].clear()
-    sqrs[i].beginFill(0xFFFFFF)
-    sqrs[i].neededColor = finalColors[i]
-    sqrs[i].lineStyle(1, 0x000000, 1)
-    sqrs[i].drawRect(0, 0, 32, 32)
-    sqrs[i].endFill()
-    let text = new Text(mainPalette[finalColors[i]] + 1, style)
-    text.x = sqrs[i].x
-    text.y = sqrs[i].y
-    container.addChild(text)
-}
-
-//ПОЛУЧЕНИЕ 10 ДОМНИРУЮЩИХ ЦВЕТОВ
-function getMainPalette(img) {
-    const colorThief = new ColorThief();
-    if (img.complete) {
-        colorThief.getColor(img);
-    }
-    else {
-        img.addEventListener('load', function () {
-            colorThief.getColor(img);
-        });
-    }
-    return colorThief.getPalette(img)
-}
-
-
 //ПОЛУЧЕНИЕ ПИКСЕЛЕЙ И ЦВЕТОВ
 function getMainColors(img) {
     const canvas = document.createElement('canvas')
@@ -302,7 +262,7 @@ function getMainColors(img) {
     canvas.setAttribute('id', 'imageCanvas')
     document.body.appendChild(canvas)
 //    canvas.style.display = 'none'
-//    --если нужно скрыть канвас
+//    ЕСЛИ НУЖНО СКРЫТЬ КАНВАС
     const ctx = canvas.getContext('2d')
     ctx.drawImage(img, 0, 0, 100, 100)
     const imageData = ctx.getImageData(0, 0, 100, 100)
@@ -316,14 +276,14 @@ function getMainColors(img) {
     return main100colors
 }
 
-//функция перевода RGB в 16-систему
+//ПЕРЕВОД RGB В HEX
 function rgb2hex(r, g, b) {
     return "0x" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
 
 
-//функция нахождения ближайшего цвета из палитры
+//НАХОЖДЕНИЕ НУЖНОГО ЦВЕТА
  function closestColor(color, palette) {
         let fi = 0
         let colorIndex = 0
@@ -341,7 +301,55 @@ function rgb2hex(r, g, b) {
     return palette[colorIndex]
 }
 
+//заменяю отрисованный квадрат другим с выбранным цветом
+function sqrClickStart() {
+    if(colorSelected) {
+        pointerDown = true
+        this.clear()
+        this.beginFill(selectedColor)
+        this.color = selectedColor
+        this.lineStyle(1, 0x000000, 1)
+        this.drawRect(0, 0, 32, 32)
+        this.endFill()
+    }
+}
 
+//КНОПКА МЫШИ ОТЖАТА НА КВАДРАТЕ
+function sqrClickEnd() {
+    pointerDown = false
+}
+
+
+//МЫШЬ ПЕРЕМЕЩАЕТСЯ ОТ КВАДРАТА К КВАДРАТУ
+function sqrClickMove() {
+    if (mouseposition.x < 96 || mouseposition.x > (94 + container.width) || mouseposition.y < 96 || mouseposition.y > (94 + container.height)) {
+        pointerDown = false
+    }
+    if (pointerDown){
+        this.clear()
+        this.beginFill(selectedColor)
+        this.color = selectedColor
+        this.lineStyle(1, 0x000000, 1)
+        this.drawRect(0, 0, 32, 32)
+        this.endFill()
+    }
+}
+
+//УВЕЛИЧЕНИЕ ДО 8 РАЗ
+function resizeBigClick() {
+    if (scaleCount !== 8){
+        scaleCount++
+        container.scale.set(1 + (0.1 * scaleCount))
+    }
+}
+
+//УМЕНЬШЕНИЕ КАРТИНКИ ДО ИСХОДНЫХ РАЗМЕРОВ
+function resizeSmClick() {
+    scaleCount = 0
+    container.scale.set(1)
+}
+
+//СОХРАНЕНИЕ ИГРЫ
 function saveGame() {
     const colList = []
     container.children.forEach(child => colList.push(child.color))
@@ -349,6 +357,7 @@ function saveGame() {
     colList.length = 0
 }
 
+//ПРОВЕРКА ВЫИГРЫША (НУЖНОГО ЦВЕТА И НАСТОЯЩЕГО)
 function checkWin() {
     let text = new Text()
     app.stage.addChild(text)
@@ -364,32 +373,34 @@ function checkWin() {
         text.anchor.set(.5)
         text.x = app.screen.width / 2
         text.y = 40
-//        app.stage.addChild(text)
     }else{
         text.text = 'Try again'
         text.style = {fontSize: 30, fill: 0xFF0000}
         text.anchor.set(.5)
         text.x = app.screen.width / 2
         text.y = 40
-//        app.stage.addChild(text)
     }
-    let textTimer = function() {
-        setTimeout(text.parent.removeChild(text), 3000)
+    function textDestroy(text) {
+        text.destroy()
     }
-    textTimer()
+
+    setTimeout(textDestroy, 2000, text)
 }
 
+//ЗАГРУЗКА ПРОГРЕССА
 function loadGame() {
     const loaded = localStorage.getItem('colors').split(',')
     for (let i = 0; i < sqrs.length; i++) {
         sqrs[i].clear()
         sqrs[i].beginFill(loaded[i])
+        sqrs[i].color = loaded[i]
         sqrs[i].lineStyle(1, 0x000000, 1)
         sqrs[i].drawRect(0, 0, 32, 32)
         sqrs[i].endFill()
     }
 }
 
+//ПОЛУЧЕНИЕ КЛЮЧА ПО ЗНАЧЕНИЮ
 function getKeyByValue(object, value) {
   return Object.keys(object).find(key => object[key] === value);
 }
