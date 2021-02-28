@@ -24,15 +24,15 @@ document.body.appendChild(app.view)
 
 const img = document.getElementById('canvas_image')
 const mainColors = getMainColors(img)
-const tenColors = getMainPalette(img)
+const tenColors = getMainPalette(mainColors)
 const mainPalette = {}
 for (let i = 0; i < tenColors.length; i++) {
-    mainPalette[rgb2hex(tenColors[i][0], tenColors[i][1], tenColors[i][2])] = i
+    mainPalette[rgb2hex(+tenColors[i][0], +tenColors[i][1], +tenColors[i][2])] = i
 }
 const finalColors = []
 for (let color of mainColors) {
     let closest = closestColor(color, tenColors)
-    finalColors.push(rgb2hex(closest[0], closest[1], closest[2]))
+    finalColors.push(rgb2hex(+closest[0], +closest[1], +closest[2]))
 }
 let pointerDown = false,
     mouseposition = app.renderer.plugins.interaction.mouse.global,
@@ -213,17 +213,27 @@ for (let i = 0; i < sqrs.length; i++) {
 
 
 //ПОЛУЧЕНИЕ 10 ДОМНИРУЮЩИХ ЦВЕТОВ
-function getMainPalette(img) {
-    const colorThief = new ColorThief();
-    if (img.complete) {
-        colorThief.getColor(img);
-    }
-    else {
-        img.addEventListener('load', function () {
-            colorThief.getColor(img);
-        });
-    }
-    return colorThief.getPalette(img)
+function getMainPalette(palette) {
+    const colors = {}
+    const tenColors = []
+    palette.forEach(color => {
+        if (colors[color]){
+            colors[color] += 1
+        } else {
+            colors[color] = 1
+        }
+    })
+    let tenColorsId = Object.values(colors).sort((a, b) => {
+        return a - b
+        })
+    tenColorsId = tenColorsId.slice(tenColorsId.length - 10)
+    tenColorsId.forEach(value => {
+        let key = (getKeyByValue(colors, value))
+        tenColors.push(key.split(','))
+        delete colors[key]
+    })
+    return tenColors
+
 }
 
 
@@ -288,7 +298,7 @@ function rgb2hex(r, g, b) {
         let fi = 0
         let colorIndex = 0
         for (let i = 0; i < palette.length; i++) {
-            const fiTemp = 30 * (palette[i][0] - color[0])**2 + 59 * (palette[i][1] - color[1])**2 + 11 * (palette[i][2] - color[2])**2
+            const fiTemp = 30 * (+palette[i][0] - +color[0])**2 + 59 * (+palette[i][1] - +color[1])**2 + 11 * (+palette[i][2] - +color[2])**2
             if (fi) {
                 if (fiTemp < fi) {
                     fi = fiTemp
